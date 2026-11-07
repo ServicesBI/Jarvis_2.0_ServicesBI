@@ -1,0 +1,24 @@
+{
+  "name": "jarvis-pet",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.jarvis.pet",
+    "productName": "JARVIS Pet",
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "JARVIS-Pet.exe"
+    },
+    "files": ["main.js", "pet.html"]
+  }
+}

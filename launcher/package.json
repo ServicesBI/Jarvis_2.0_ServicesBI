@@ -1,0 +1,40 @@
+{
+  "name": "felipe-launcher",
+  "version": "1.0.0",
+  "description": "FELIPE Desktop Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "author": "Gabriel Felipe Fernandes",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.jarvis.launcher",
+    "productName": "FELIPE Launcher",
+    "forceCodeSigning": false,
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "FELIPE-Launcher.exe"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "updater.js",
+      "renderer/**",
+      "assets/**",
+      "node_modules/adm-zip/**"
+    ]
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.17"
+  }
+}

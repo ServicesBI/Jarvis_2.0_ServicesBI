@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FELIPE Launcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Barra de título customizada (frameless) -->
+  <div class="titlebar">
+    <span class="titlebar-text">FELIPE LAUNCHER</span>
+    <div class="titlebar-btns">
+      <button class="tb-btn tb-min" onclick="jarvis.minimize()">─</button>
+      <button class="tb-btn tb-close" onclick="jarvis.close()">✕</button>
+    </div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="container">
+
+    <!-- Arc Reactor animado -->
+    <div class="reactor-wrap">
+      <div class="reactor" id="reactor">
+        <div class="reactor-core"></div>
+        <div class="reactor-ring ring-1"></div>
+        <div class="reactor-ring ring-2"></div>
+        <div class="reactor-ring ring-3"></div>
+        <div class="reactor-ring ring-4"></div>
+        <div class="reactor-glow"></div>
+        <div class="reactor-tri tri-top"></div>
+        <div class="reactor-tri tri-bottom"></div>
+        <div class="reactor-tri tri-left"></div>
+        <div class="reactor-tri tri-right"></div>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <h1 class="title">F.E.L.I.P.E.</h1>
+    <p class="subtitle">Voice AI Assistant</p>
+    <div class="version-tag">MARK V &middot; VOICE AI</div>
+
+    <!-- Update Card -->
+    <div class="update-card" id="update-card" style="display:none">
+      <div class="update-header" id="update-header">Verificando atualizações...</div>
+      <div class="update-msg" id="update-msg"></div>
+      <div class="update-progress-bar">
+        <div class="update-progress-fill" id="update-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-card" id="status-card">
+      <div class="status-header">System Diagnostics</div>
+      <div class="status-row">
+        <span class="status-label">Servidor</span>
+        <span class="status-value" id="status-server">
+          <span class="dot dot-off"></span> Offline
+        </span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Node.js</span>
+        <span class="status-value" id="status-node">Verificando...</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Claude CLI</span>
+        <span class="status-value" id="status-claude">Verificando...</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">OpenAI Key</span>
+        <span class="status-value" id="status-env">Verificando...</span>
+      </div>
+    </div>
+
+    <!-- Botões de controle -->
+    <div class="controls">
+      <button class="btn btn-start" id="btn-start" onclick="handleStart()">
+        <span class="btn-icon">▶</span>
+        <span class="btn-text">Ligar FELIPE</span>
+      </button>
+      <button class="btn btn-stop" id="btn-stop" onclick="handleStop()" disabled>
+        <span class="btn-icon">■</span>
+        <span class="btn-text">Desligar</span>
+      </button>
+      <button class="btn btn-restart" id="btn-restart" onclick="handleRestart()" disabled>
+        <span class="btn-icon">↻</span>
+        <span class="btn-text">Reiniciar</span>
+      </button>
+    </div>
+
+    <!-- Botão abrir navegador -->
+    <button class="btn btn-browser" id="btn-browser" onclick="handleBrowser()" disabled>
+      Abrir FELIPE no Navegador
+    </button>
+
+    <!-- Botão auto-fix (aparece quando há problemas) -->
+    <button class="btn btn-autofix" id="btn-autofix" onclick="handleAutofix()" style="display:none">
+      Corrigir Automaticamente
+    </button>
+
+    <!-- Botão abrir terminal Claude -->
+    <button class="btn btn-terminal" id="btn-terminal" onclick="jarvis.openClaudeTerminal()">
+      Abrir Terminal Claude para FELIPE
+    </button>
+
+    <!-- Botão configurar Claude (aparece quando não instalado) -->
+    <button class="btn btn-claude-setup" id="btn-claude-setup" onclick="jarvis.openClaudeLogin()" style="display:none">
+      Configurar Claude CLI
+    </button>
+
+    <!-- Log do servidor -->
+    <div class="log-card" id="log-card">
+      <div class="log-header">Terminal</div>
+      <div class="log-content" id="log-content"></div>
+    </div>
+
+  </div>
+
+  <!-- Rodapé -->
+  <div class="footer">
+    <span>Powered by <strong>Gabriel Felipe Fernandes</strong></span>
+    <span class="footer-ver">v1.0</span>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

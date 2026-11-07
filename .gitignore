@@ -1,0 +1,62 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+system/JARVIS-MEMORY.md
+system/JARVIS-HISTORY.json
+system/FELIPE-MEMORY.md
+system/FELIPE-HISTORY.json
+system/memory-embeddings.json
+system/mega-brain/
+system/last-audio*
+system/workflows/
+system/task-state.json
+Documents and Projects/
+pet/node_modules/
+sensors/
+launcher/node_modules/
+launcher/dist/
+launcher/build/
+.cache/
+*.exe
+*.xlsx
+*.pdb
+jarvis-autostart.vbs
+jarvis-service.bat
+__pycache__/
+*.pyc
+.venv/
+gen-pdf-guide.cjs
+.synapse/
+
+# Dados sensíveis / runtime local
+*.local.json
+
+# Historico Git antigo - nunca publicar
+.git-historico-antigo/
+
+# Dados operacionais e relatorios locais
+system/cutover-reports/
+system/openai-balance-ledger.json
+
+# Credenciais e chaves
+*.pem
+*.key
+*.p12
+*.pfx
+*.secret
+*credentials*.json
+*token*.json
+
+# Configuracoes locais do usuario
+.claude/
+.codex/
+.obsidian/workspace.json
+obsidian-template/.obsidian/workspace.json
+obsidian-template/.obsidian/graph.json
+
+# Arquivos temporarios e backups locais
+_to_delete/
+*.bak
+*.tmp

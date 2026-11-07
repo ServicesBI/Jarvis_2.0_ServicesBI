@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    background: #020609;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 40px 45px;
+    background: #020609;
+    page-break-after: always;
+    position: relative;
+  }
+
+  .page:last-child { page-break-after: avoid; }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 228, 255, 0.15);
+    margin-bottom: 30px;
+  }
+
+  .header-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #00e4ff;
+    letter-spacing: 3px;
+  }
+
+  .header-right {
+    font-size: 9px;
+    color: #555;
+  }
+
+  /* Title section */
+  .title-section {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .title-main {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    letter-spacing: 12px;
+    color: #00e4ff;
+    text-shadow: 0 0 20px rgba(0, 228, 255, 0.3);
+    margin-bottom: 8px;
+  }
+
+  .title-line {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00e4ff, transparent);
+    margin: 12px auto;
+  }
+
+  .title-sub {
+    font-size: 16px;
+    font-weight: 300;
+    color: #888;
+    letter-spacing: 2px;
+  }
+
+  .title-desc {
+    font-size: 11px;
+    color: #555;
+    margin-top: 10px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .version-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 2px;
+    margin-top: 16px;
+  }
+
+  /* Section titles */
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #00e4ff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0, 228, 255, 0.1);
+  }
+
+  h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #ffb84e;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 11px;
+  }
+
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    background: rgba(0, 228, 255, 0.05);
+    border: 1px solid rgba(0, 228, 255, 0.1);
+    color: #00e4ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  td {
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #ccc;
+    line-height: 1.5;
+  }
+
+  /* Steps */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: #00e4ff;
+    opacity: 0.3;
+    min-width: 36px;
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  .step-content { flex: 1; }
+
+  .step-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #e0e0e0;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-size: 11px;
+    color: #999;
+    line-height: 1.6;
+  }
+
+  /* Code block */
+  .code-block {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 228, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #00ff88;
+    line-height: 1.6;
+    margin: 8px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Tips */
+  .tip {
+    font-size: 11px;
+    color: #999;
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .tip::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #00e4ff;
+  }
+
+  /* Links */
+  a { color: #00e4ff; text-decoration: none; }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 30px;
+    left: 45px;
+    right: 45px;
+    text-align: center;
+    font-size: 8px;
+    color: #333;
+    letter-spacing: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    padding-top: 10px;
+  }
+
+  /* Prompt section */
+  .prompt-box {
+    background: rgba(0, 228, 255, 0.03);
+    border: 1px solid rgba(0, 228, 255, 0.12);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 12px 0;
+  }
+
+  .prompt-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #00e4ff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .prompt-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: #ccc;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .warn-text {
+    color: #ffb84e;
+    font-size: 10px;
+    font-style: italic;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: Cover -->
+<div class="page">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <div class="title-section">
+      <div class="title-main">J . A . R . V . I . S</div>
+      <div class="title-line"></div>
+      <div class="title-sub">Guia de Instalação e Configuração</div>
+      <div class="title-desc">
+        Seu Assistente Pessoal de IA<br>
+        Um guia completo para instalar e configurar o seu sistema JARVIS de IA,
+        utilizando Claude e OpenAI.
+      </div>
+      <div class="version-tag">Versão 1.0  |  Confidencial  |  2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Requirements -->
+<div class="page">
+  <div class="header">
+    <span class="header-left">JARVIS</span>
+    <span class="header-right">Guia de Instalação e Configuração &mdash; Página 2</span>
+  </div>
+
+  <h2>Requisitos do Sistema</h2>
+  <p style="font-size: 11px; color: #888; margin-bottom: 16px;">Antes de começar, certifique-se de ter as seguintes contas e ferramentas prontas:</p>
+
+  <table>
+    <tr><th>Requisito</th><th>Detalhes</th></tr>
+    <tr><td>App Claude Desktop</td><td>Assine e baixe em claude.ai &mdash; este é o motor do nosso projeto.</td></tr>
+    <tr><td>Créditos OpenAI API</td><td>Adicione o valor mínimo de créditos para o chat por voz. Cada interação custa apenas centavos.</td></tr>
+    <tr><td>Chave API OpenAI</td><td>Gere uma chave API para a funcionalidade de voz (usada no Passo 3).</td></tr>
+  </table>
+
+  <h2>Links Importantes</h2>
+  <table>
+    <tr><td>Plataforma Claude</td><td><a href="https://claude.ai/">https://claude.ai/</a></td></tr>
+    <tr><td>Cobrança OpenAI</td><td>platform.openai.com/settings/.../billing</td></tr>
+    <tr><td>Chaves API OpenAI</td><td>platform.openai.com/settings/.../api-keys</td></tr>
+  </table>
+
+  <div class="footer">JARVIS &bull; Powered by Claude & OpenAI &bull; 2026</div>
+</div>
+
+<!-- PAGE 3: Setup Steps -->
+<div class="page">
+  <div class="header">
+    <span class="header-left">JARVIS</span>
+    <span class="header-right">Guia de Instalação e Configuração &mdash; Página 3</span>
+  </div>
+
+  <h2>Passo a Passo da Instalação</h2>
+  <p style="font-size: 11px; color: #888; margin-bottom: 20px;">Siga estes passos cuidadosamente para colocar o JARVIS em funcionamento:</p>
+
+  <div class="step">
+    <div class="step-num">01</div>
+    <div class="step-content">
+      <div class="step-title">Criar Pasta do Projeto</div>
+      <div class="step-desc">Crie uma pasta na sua área de trabalho chamada "jarvis" e coloque o PDF de configuração dentro dela.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">02</div>
+    <div class="step-content">
+      <div class="step-title">Abrir o Claude Code</div>
+      <div class="step-desc">Usando o aplicativo Claude Desktop, vá até a seção "Code" abaixo do chat e selecione a pasta Jarvis na sua área de trabalho.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">03</div>
+    <div class="step-content">
+      <div class="step-title">Executar o Blueprint</div>
+      <div class="step-desc">Digite no chat:</div>
+      <div class="code-block">"Leia este PDF inteiro e execute tudo que está descrito nele para criar o Jarvis. O PDF completo está na pasta desktop/jarvis."
+
+Inclua sua chave API na mensagem:
+OPENAI_API_KEY=COLE-SUA-CHAVE-AQUI</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">04</div>
+    <div class="step-content">
+      <div class="step-title">Verificar Autenticação</div>
+      <div class="step-desc">Digite no chat: Certifique-se de que o Claude CLI está autenticado com a conta do usuário e que a chave API da OpenAI fornecida está funcionando no projeto. Realize todos os testes no terminal e converse por voz via OpenAI.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">05</div>
+    <div class="step-content">
+      <div class="step-title">Testar o JARVIS</div>
+      <div class="step-desc">Execute um teste completo do sistema JARVIS para confirmar que todas as funcionalidades estão operando corretamente, incluindo interação por voz e respostas da IA.</div>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 24px;">Dicas e Boas Práticas</h2>
+  <div class="tip">Mantenha sua chave API segura e nunca a compartilhe publicamente.</div>
+  <div class="tip">Comece com o valor mínimo de créditos na OpenAI &mdash; você sempre pode adicionar mais depois.</div>
+  <div class="tip">Certifique-se de que sua assinatura do Claude está ativa antes de iniciar o processo de configuração.</div>
+  <div class="tip">Se algum passo falhar, releia as instruções e verifique suas credenciais.</div>
+
+  <div class="footer">JARVIS &bull; Powered by Claude & OpenAI &bull; 2026</div>
+</div>
+
+<!-- PAGE 4: Voice Diagnostic & Optimization Prompt -->
+<div class="page">
+  <div class="header">
+    <span class="header-left">JARVIS</span>
+    <span class="header-right">Guia de Instalação e Configuração &mdash; Página 4</span>
+  </div>
+
+  <h2>Passo 06 &mdash; Diagnóstico e Otimização de Voz</h2>
+  <p style="font-size: 11px; color: #888; margin-bottom: 12px;">
+    Após a instalação, cole este prompt no chat do JARVIS para auditar o sistema de voz, corrigir problemas de alucinação e otimizar a velocidade de resposta.
+  </p>
+
+  <div class="prompt-box">
+    <div class="prompt-label">Prompt de Diagnóstico &mdash; Cole no Chat do JARVIS</div>
+    <div class="prompt-text">JARVIS, execute a complete voice system audit and repair. Inspect the actual source code and fix anything broken:
+
+1. READ app/api/voice.py and verify the hallucination filter exists with these rules:
+   - Block any transcription under 4 characters
+   - Block single words under 8 characters
+   - Block known phantom phrases in English: "Bye", "Goodbye", "Farewell", "Thank you for watching", "Subscribe", "Like and subscribe"
+   - Block known phantom phrases in Portuguese: "Tchau", "Adeus", "Obrigado por assistir", "Legendas pela comunidade", "Inscreva-se", "Curta e se inscreva"
+   - Block noise markers: [Music], [Applause], (silence), "...", "Um", "Uh", "Hmm"
+   - Block repetitive text where 70%+ of words are the same
+   - If the filter is missing or incomplete, ADD it before the /api/stt route
+
+2. READ app/api/voice.py and verify /api/stt route has:
+   - No temperature parameter (remove if present)
+   - No fixed language parameter — try English first, if hallucination detected try Portuguese
+   - Prompt hint with realistic command examples in both languages
+   - Rejects audio files smaller than 2000 bytes
+   - Logs raw transcription to console before and after filtering
+   - Saves last audio to system/last-audio-debug.webm for debugging
+
+3. READ public/script.js and verify MediaRecorder config:
+   - getUserMedia with: echoCancellation: false, noiseSuppression: false, autoGainControl: true
+   - NO sampleRate constraint, NO channelCount constraint
+   - mediaRecorder.start() with NO timeslice argument (single chunk, not fragmented)
+   - audioBitsPerSecond: 128000
+   - Minimum recording duration check (reject &lt; 800ms)
+   - Audio level monitoring with peak volume tracking
+   - Silence detection (reject if peakVolume &lt; 5)
+
+4. READ public/script.js and verify transcribeAndSend handles filtered responses:
+   - If server returns { filtered: true }, show warning in terminal and return to idle
+   - If server returns empty text, show "No speech detected" warning
+
+5. Save to system/JARVIS-MEMORY.md under Technical Context:
+   "Voice filter audit complete — hallucination filter verified with EN/PT patterns, MediaRecorder set to single-chunk 128kbps WebM, no browser audio processing, dual-language STT with fallback"
+
+6. Report: list each check as PASS or FAIL. If any FAIL, fix the code immediately.
+
+7. OPTIMIZE RESPONSE SPEED AND BEHAVIOR:
+
+   A) INSTANT CONTEXTUAL ACKNOWLEDGMENT: When the user asks JARVIS to do anything (create, build, generate, analyze, write, design, fix, make, produce, develop), JARVIS must IMMEDIATELY respond in voice AND terminal with a short contextual confirmation BEFORE starting the work. Examples:
+      - "Create an e-book about digital marketing" → "Right away, sir. Creating your digital marketing e-book now."
+      - "Build me a website" → "On it, sir. Setting up the website architecture."
+      This must NOT use a separate Claude CLI spawn — use a pre-built contextual phrase generated from the user's message keywords, sent to TTS immediately while the main process works in background.
+
+   B) SMART MODEL SELECTION BY COMPLEXITY:
+      - claude-haiku-4-5-20251001 ONLY for simple questions (greetings, status checks, quick answers)
+      - claude-sonnet-4-6 for creative and moderate tasks (create, build, generate, write, design, fix, analyze, report, PDF, website, code)
+      - claude-opus-4-6 for complex and critical tasks (architect, refactor, e-book, infrastructure, deploy, comprehensive, advanced, production, enterprise, detailed, deep analysis)
+      - Voice responses must be fast (TTS first 2 sentences only) but task execution uses the best model for quality
+      - Skip semantic memory search for voice requests (saves 1-2s)
+      - Stream response to terminal as first chunk arrives
+      - Run storeMemory and appendHistory AFTER response (non-blocking)
+
+   C) VOICE COMPLETION NOTIFICATION: When JARVIS finishes a long task, send voice: "Done, sir. Your [item] is ready." Show [system] log with path and download cards.
+
+   D) REDUCE buildJarvisPrompt for voice: shorter prompt for simple questions, full context only for creation tasks.
+
+   E) NO QUESTIONS — JUST EXECUTE: Add to the JARVIS system prompt:
+      "CRITICAL: NEVER ask clarifying questions. NEVER ask 'would you like me to...' or 'should I...'. When sir gives a command, EXECUTE IT IMMEDIATELY and deliver the complete result. Make smart decisions on your own. If details are missing, use your best judgment and deliver."
+      JARVIS must act like a real assistant — when told to do something, DO IT, don't ask about it.
+
+   Implement ALL optimizations in the actual code.</div>
+  </div>
+
+  <div class="warn-text">Importante: Execute este diagnóstico após cada instalação nova ou se a voz parar de funcionar corretamente.</div>
+
+  <h2 style="margin-top: 20px;">Layout do Cockpit e Configuração dos Modelos de IA</h2>
+  <p style="font-size: 11px; color: #888; margin-bottom: 12px;">
+    O layout do cockpit e a configuração dos cards de IA aplicados à interface do JARVIS.
+  </p>
+
+  <h3>Regras de Layout</h3>
+  <table>
+    <tr><th>Elemento</th><th>Configuração</th></tr>
+    <tr><td>Orbe Arc Reactor</td><td>280x280px, centralizado na área principal com 3 anéis orbitais (260/210/160px), núcleo de 110px com brilho radial</td></tr>
+    <tr><td>Terminal</td><td>Compacto: altura fixa de 180px, posicionado abaixo do orbe</td></tr>
+    <tr><td>Linha de Cards de Status</td><td>7 cards: Sessão, Tokens, Plano, Requisições + Haiku, Sonnet, Opus 4.6 (modelo ativo destacado)</td></tr>
+    <tr><td>Linha de Agentes</td><td>10 chips de agentes AIOX Core + chip Mega-brain, centralizados abaixo dos cards de status, acendem quando ativos</td></tr>
+    <tr><td>Barra de Entrada</td><td>Fixada na parte inferior: botão de mic, campo de texto, anexo, enviar</td></tr>
+  </table>
+
+  <h3>Seleção de Modelo de IA</h3>
+  <table>
+    <tr><th>Modelo</th><th>Usado Para</th><th>Cor do Card</th></tr>
+    <tr><td>Haiku 4.5</td><td>Perguntas simples, saudações, verificações de status</td><td>Ponto verde</td></tr>
+    <tr><td>Sonnet 4.6</td><td>Tarefas criativas e moderadas &mdash; criar, construir, gerar, escrever, design, corrigir, analisar, relatório, PDF, website, código</td><td>Ponto roxo</td></tr>
+    <tr><td>Opus 4.6</td><td>Tarefas complexas e críticas &mdash; arquitetura, refatoração, e-book, infraestrutura, deploy, abrangente, avançado, produção</td><td>Ponto ciano (brilho ativo)</td></tr>
+  </table>
+
+  <h3>Agentes AIOX Core</h3>
+  <table>
+    <tr><th>Agente</th><th>Função</th></tr>
+    <tr><td>@dev</td><td>Desenvolvedor Principal &mdash; escreve código, implementa funcionalidades</td></tr>
+    <tr><td>@architect</td><td>Arquiteto de Sistema &mdash; projeta estrutura, padrões</td></tr>
+    <tr><td>@qa</td><td>Garantia de Qualidade &mdash; testa, valida</td></tr>
+    <tr><td>@pm</td><td>Gerente de Projeto &mdash; planeja, acompanha progresso</td></tr>
+    <tr><td>@po</td><td>Product Owner &mdash; requisitos, backlog</td></tr>
+    <tr><td>@devops</td><td>DevOps &mdash; deploy, CI/CD</td></tr>
+    <tr><td>@analyst</td><td>Analista de Negócios &mdash; dados, relatórios</td></tr>
+    <tr><td>@ux</td><td>Designer UX &mdash; interfaces, fluxos</td></tr>
+    <tr><td>@sm</td><td>Scrum Master &mdash; práticas ágeis</td></tr>
+    <tr><td>@data-eng</td><td>Engenheiro de Dados &mdash; pipelines, bancos de dados</td></tr>
+    <tr><td>Mega-brain</td><td>Base de conhecimento &mdash; 3400+ arquivos de expertise</td></tr>
+  </table>
+
+  <h3>Regras de Comportamento</h3>
+  <div class="tip">Opus 4.6 executa TODAS as tarefas para a mais alta qualidade de entrega</div>
+  <div class="tip">JARVIS NUNCA faz perguntas de esclarecimento &mdash; executa imediatamente ao comando</div>
+  <div class="tip">Confirmação por voz instantânea antes de processar: "Right away, sir..."</div>
+  <div class="tip">TTS limitado às primeiras 2 frases para feedback rápido por voz</div>
+  <div class="tip">Entende Português e Inglês, sempre responde em Inglês</div>
+
+  <div class="footer">JARVIS &bull; Powered by Claude & OpenAI &bull; 2026</div>
+</div>
+
+</body>
+</html>

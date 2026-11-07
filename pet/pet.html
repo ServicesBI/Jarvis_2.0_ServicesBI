@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JARVIS Zeus Pet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    background: transparent;
+    user-select: none;
+  }
+  #container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  canvas {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 0; left: 0;
+    cursor: grab;
+  }
+  #mic-btn {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(192, 132, 252, 0.4);
+    background: rgba(20, 0, 40, 0.85);
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+  }
+  #mic-btn:hover {
+    border-color: rgba(192, 132, 252, 0.8);
+    box-shadow: 0 0 12px rgba(192, 132, 252, 0.3);
+    transform: scale(1.1);
+  }
+  #mic-btn.active {
+    border-color: #0f0;
+    background: rgba(0, 255, 0, 0.15);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+    animation: mic-pulse 1.5s ease-in-out infinite;
+  }
+  #mic-btn svg { width: 16px; height: 16px; }
+  @keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(0,255,0,0.3); }
+    50% { box-shadow: 0 0 20px rgba(0,255,0,0.6); }
+  }
+
+  #tooltip {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 0, 40, 0.92);
+    color: #c084fc;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(192, 132, 252, 0.4);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #container:hover #tooltip { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="container">
+  <canvas id="zeus" width="400" height="400"></canvas>
+  <button id="mic-btn" title="Ativar JARVIS (Voz + Cowork)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </svg>
+  </button>
+  <div id="tooltip">JARVIS — Checking...</div>
+</div>
+
+<script>
+const canvas = document.getElementById('zeus');
+const ctx = canvas.getContext('2d');
+const W = 400, H = 400;
+const CX = W / 2, CY = H / 2 - 10;
+
+// States
+const STATES = {
+  idle:      { cloudColor: [60, 40, 80],  eyeColor: '#fff', mouthOpen: 0.3, pulseSpeed: 0.015 },
+  listening: { cloudColor: [40, 60, 90],  eyeColor: '#aff', mouthOpen: 0.5, pulseSpeed: 0.025 },
+  thinking:  { cloudColor: [80, 50, 20],  eyeColor: '#ffa', mouthOpen: 0.1, pulseSpeed: 0.04 },
+  speaking:  { cloudColor: [70, 30, 90],  eyeColor: '#fff', mouthOpen: 0.8, pulseSpeed: 0.035 },
+};
+let currentState = 'idle';
+let t = 0;
+
+// Cloud puffs (define the cloud shape)
+const puffs = [
+  { x: 0, y: -25, r: 65 },    // top center
+  { x: -50, y: -10, r: 55 },  // top left
+  { x: 50, y: -10, r: 55 },   // top right
+  { x: -65, y: 25, r: 50 },   // mid left
+  { x: 65, y: 25, r: 50 },    // mid right
+  { x: -40, y: 45, r: 45 },   // bottom left
+  { x: 40, y: 45, r: 45 },    // bottom right
+  { x: 0, y: 50, r: 50 },     // bottom center
+  { x: -25, y: -35, r: 45 },  // top-left inner
+  { x: 25, y: -35, r: 45 },   // top-right inner
+  { x: 0, y: 15, r: 60 },     // center fill
+];
+
+// Lightning bolts
+let lightnings = [];
+let lightningTimer = 0;
+
+function createLightning() {
+  const side = Math.random() > 0.5 ? 1 : -1;
+  const startX = CX + side * (50 + Math.random() * 40);
+  const startY = CY + 40 + Math.random() * 20;
+  const segments = [];
+  let x = startX, y = startY;
+  const numSegs = 3 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < numSegs; i++) {
+    const nx = x + (Math.random() - 0.5) * 30;
+    const ny = y + 15 + Math.random() * 20;
+    segments.push({ x1: x, y1: y, x2: nx, y2: ny });
+    x = nx; y = ny;
+  }
+  return { segments, life: 1.0, maxLife: 1.0, color: Math.random() > 0.3 ? '#c084fc' : '#00e4ff' };
+}
+
+function drawCloud(pulse) {
+  const st = STATES[currentState];
+  const [cr, cg, cb] = st.cloudColor;
+
+  // Outer glow
+  const glow = ctx.createRadialGradient(CX, CY + 10, 30, CX, CY + 10, 130);
+  glow.addColorStop(0, `rgba(${cr+40}, ${cg+20}, ${cb+60}, ${0.2 * pulse})`);
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw cloud body
+  ctx.save();
+
+  // Shadow under cloud
+  ctx.beginPath();
+  ctx.ellipse(CX, CY + 85, 70, 12, 0, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(0, 0, 0, ${0.15 * pulse})`;
+  ctx.fill();
+
+  // Cloud puffs with wobble
+  for (const p of puffs) {
+    const wobbleX = Math.sin(t * 0.02 + p.x * 0.1) * 3;
+    const wobbleY = Math.cos(t * 0.025 + p.y * 0.1) * 2;
+    const wobbleR = Math.sin(t * 0.03 + p.r) * 3;
+
+    const px = CX + p.x + wobbleX;
+    const py = CY + p.y + wobbleY;
+    const pr = p.r + wobbleR;
+
+    // Dark cloud gradient
+    const grad = ctx.createRadialGradient(px - pr * 0.2, py - pr * 0.3, 0, px, py, pr);
+    grad.addColorStop(0, `rgba(${cr+30}, ${cg+20}, ${cb+40}, ${0.95 * pulse})`);
+    grad.addColorStop(0.5, `rgba(${cr}, ${cg}, ${cb}, ${0.9 * pulse})`);
+    grad.addColorStop(1, `rgba(${Math.floor(cr*0.5)}, ${Math.floor(cg*0.4)}, ${Math.floor(cb*0.6)}, ${0.7 * pulse})`);
+
+    ctx.beginPath();
+    ctx.arc(px, py, pr, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // Inner highlight (top)
+  const highlight = ctx.createRadialGradient(CX - 20, CY - 30, 0, CX, CY - 10, 80);
+  highlight.addColorStop(0, `rgba(${cr+80}, ${cg+60}, ${cb+100}, ${0.15 * pulse})`);
+  highlight.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = highlight;
+  ctx.fillRect(CX - 100, CY - 80, 200, 100);
+
+  ctx.restore();
+}
+
+function drawFace(pulse) {
+  const st = STATES[currentState];
+  const eyeY = CY + 5;
+  const mouthY = CY + 35;
+
+  // Wobble for expressions
+  const blink = Math.sin(t * 0.05) > 0.97; // occasional blink
+  const eyeSquint = currentState === 'thinking' ? 0.5 : 1.0;
+
+  // === EYES ===
+  const eyeSpacing = 28;
+  const eyeW = 14;
+  const eyeH = blink ? 2 : 11 * eyeSquint;
+
+  // Left eye
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(CX - eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2);
+  ctx.fillStyle = st.eyeColor;
+  ctx.shadowColor = st.eyeColor;
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.restore();
+
+  // Left pupil
+  if (!blink) {
+    ctx.beginPath();
+    ctx.ellipse(CX - eyeSpacing + 2, eyeY + 1, 6, 5 * eyeSquint, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a0a2e';
+    ctx.fill();
+    // Pupil shine
+    ctx.beginPath();
+    ctx.arc(CX - eyeSpacing - 1, eyeY - 2, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+  }
+
+  // Right eye
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(CX + eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2);
+  ctx.fillStyle = st.eyeColor;
+  ctx.shadowColor = st.eyeColor;
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.restore();
+
+  // Right pupil
+  if (!blink) {
+    ctx.beginPath();
+    ctx.ellipse(CX + eyeSpacing + 2, eyeY + 1, 6, 5 * eyeSquint, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a0a2e';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(CX + eyeSpacing - 1, eyeY - 2, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+  }
+
+  // Eyebrows (menacing like Zeus)
+  ctx.strokeStyle = `rgba(30, 10, 50, ${0.8 * pulse})`;
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  // Left brow
+  ctx.beginPath();
+  ctx.moveTo(CX - eyeSpacing - 16, eyeY - 16);
+  ctx.quadraticCurveTo(CX - eyeSpacing, eyeY - 20, CX - eyeSpacing + 10, eyeY - 14);
+  ctx.stroke();
+  // Right brow
+  ctx.beginPath();
+  ctx.moveTo(CX + eyeSpacing + 16, eyeY - 16);
+  ctx.quadraticCurveTo(CX + eyeSpacing, eyeY - 20, CX + eyeSpacing - 10, eyeY - 14);
+  ctx.stroke();
+
+  // === MOUTH ===
+  const mouthW = 30 + st.mouthOpen * 10;
+  const mouthH = 5 + st.mouthOpen * 18;
+  const mouthWobble = Math.sin(t * 0.04) * 2;
+
+  ctx.save();
+  // Mouth shape
+  ctx.beginPath();
+  ctx.ellipse(CX, mouthY + mouthWobble, mouthW, mouthH, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a0a2e';
+  ctx.fill();
+
+  // Teeth (top row) - Zeus grin
+  if (mouthH > 8) {
+    ctx.fillStyle = '#fff';
+    const teethCount = 6;
+    const teethW = (mouthW * 1.6) / teethCount;
+    for (let i = 0; i < teethCount; i++) {
+      const tx = CX - mouthW * 0.8 + i * teethW + teethW * 0.15;
+      const ty = mouthY + mouthWobble - mouthH * 0.7;
+      ctx.fillRect(tx, ty, teethW * 0.7, mouthH * 0.4);
+    }
+  }
+  ctx.restore();
+}
+
+function drawLightning() {
+  // Spawn lightning
+  lightningTimer++;
+  const spawnRate = currentState === 'speaking' ? 8 : currentState === 'thinking' ? 15 : 25;
+  if (lightningTimer % spawnRate === 0) {
+    lightnings.push(createLightning());
+  }
+
+  // Draw & decay
+  for (let i = lightnings.length - 1; i >= 0; i--) {
+    const l = lightnings[i];
+    l.life -= 0.06;
+    if (l.life <= 0) { lightnings.splice(i, 1); continue; }
+
+    ctx.save();
+    ctx.globalAlpha = l.life;
+    ctx.strokeStyle = l.color;
+    ctx.shadowColor = l.color;
+    ctx.shadowBlur = 12;
+    ctx.lineWidth = 2 + l.life * 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    for (const s of l.segments) {
+      ctx.moveTo(s.x1, s.y1);
+      ctx.lineTo(s.x2, s.y2);
+    }
+    ctx.stroke();
+
+    // Glow pass
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = l.life * 0.5;
+    ctx.beginPath();
+    for (const s of l.segments) {
+      ctx.moveTo(s.x1, s.y1);
+      ctx.lineTo(s.x2, s.y2);
+    }
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+// Electric particles around cloud
+const sparks = [];
+for (let i = 0; i < 12; i++) {
+  sparks.push({
+    angle: Math.random() * Math.PI * 2,
+    dist: 70 + Math.random() * 30,
+    speed: 0.01 + Math.random() * 0.02,
+    size: 1 + Math.random() * 2,
+    phase: Math.random() * Math.PI * 2,
+  });
+}
+
+function drawSparks(pulse) {
+  for (const s of sparks) {
+    s.angle += s.speed;
+    const wobble = Math.sin(t * 0.04 + s.phase) * 8;
+    const px = CX + Math.cos(s.angle) * (s.dist + wobble);
+    const py = CY + 15 + Math.sin(s.angle) * (s.dist * 0.6 + wobble);
+    const alpha = (0.3 + 0.6 * Math.sin(t * 0.05 + s.phase)) * pulse;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px, py, s.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(192, 132, 252, ${alpha})`;
+    ctx.shadowColor = '#c084fc';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function draw() {
+  t++;
+  const st = STATES[currentState];
+  const pulse = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(t * st.pulseSpeed * Math.PI * 2));
+
+  ctx.clearRect(0, 0, W, H);
+
+  drawLightning();
+  drawSparks(pulse);
+  drawCloud(pulse);
+  drawFace(pulse);
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+// --- Status polling ---
+const tooltip = document.getElementById('tooltip');
+
+async function pollStatus() {
+  try {
+    if (window.jarvis) {
+      const result = await window.jarvis.getStatus();
+      if (result && result.online) {
+        const state = result.state || 'idle';
+        if (STATES[state]) currentState = state;
+        else currentState = 'idle';
+        tooltip.textContent = 'JARVIS — Online';
+      } else {
+        currentState = 'idle';
+        tooltip.textContent = 'JARVIS — Offline';
+      }
+    } else {
+      tooltip.textContent = 'JARVIS — No bridge';
+    }
+  } catch {
+    currentState = 'idle';
+    tooltip.textContent = 'JARVIS — Offline';
+  }
+}
+
+pollStatus();
+setInterval(pollStatus, 10000);
+
+// === MIC BUTTON — Toggle Cowork + Voice ===
+const micBtn = document.getElementById('mic-btn');
+let micActive = false;
+
+micBtn.addEventListener('mousedown', (e) => e.stopPropagation()); // prevent drag
+micBtn.addEventListener('click', async (e) => {
+  e.stopPropagation();
+  micActive = !micActive;
+  micBtn.classList.toggle('active', micActive);
+  micBtn.querySelector('svg').setAttribute('stroke', micActive ? '#0f0' : '#c084fc');
+  currentState = micActive ? 'listening' : 'idle';
+  tooltip.textContent = micActive ? 'JARVIS — Escutando...' : 'JARVIS — Online';
+
+  try {
+    await window.jarvis.setMicActive(micActive);
+  } catch(err) {
+    console.log('Mic toggle error:', err);
+  }
+});
+
+// === DRAG via IPC ===
+let isDragging = false;
+canvas.addEventListener('mousedown', (e) => {
+  if (e.button === 0) {
+    isDragging = true;
+    canvas.style.cursor = 'grabbing';
+    if (window.jarvis) window.jarvis.startDrag(e.screenX, e.screenY);
+  }
+});
+document.addEventListener('mousemove', (e) => {
+  if (isDragging && window.jarvis) window.jarvis.onDrag(e.screenX, e.screenY);
+});
+document.addEventListener('mouseup', () => {
+  if (isDragging) {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
+    if (window.jarvis) window.jarvis.stopDrag();
+  }
+});
+
+// === DOUBLE CLICK → cockpit ===
+canvas.addEventListener('dblclick', () => {
+  if (window.jarvis) window.jarvis.openCockpit();
+});
+
+// === RIGHT CLICK → menu ===
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  if (window.jarvis) window.jarvis.showMenu();
+});
+</script>
+</body>
+</html>

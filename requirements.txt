@@ -1,0 +1,60 @@
+# requirements.txt — JARVIS Python dependencies
+# Install: pip install -r requirements.txt
+# Python 3.10+ required
+
+# ── Captura de tela ──────────────────────────────────────────────────────────
+# screenshot.py, screenshot-cursor.py
+mss
+Pillow
+
+# ── Automação de mouse e teclado ─────────────────────────────────────────────
+# computer-action.py, ui-automation.py (lazy), workflow-recorder.py (lazy)
+pyautogui
+
+# ── Clipboard ────────────────────────────────────────────────────────────────
+# ui-automation.py (lazy-loaded, fallback para paste via clipboard)
+pyperclip
+
+# ── Informações de processos do sistema ──────────────────────────────────────
+# screen-state.py (lazy-loaded para detecção de processos ativos)
+psutil
+
+# ── Criação e edição de planilhas Excel ──────────────────────────────────────
+# automacao de planilhas do backend FastAPI
+openpyxl
+
+# Criacao de documentos Word pelo Action Engine
+python-docx
+
+# ── UI Automation Windows ────────────────────────────────────────────────────
+# ui-automation.py (lazy-loaded, somente Windows)
+uiautomation
+
+# ── WebSocket / Chrome DevTools Protocol ─────────────────────────────────────
+# browser-control.py — OPCIONAL: importado com try/except, fallback gracioso
+# Instalar apenas se for usar controle de Chrome via CDP:
+# websockets
+
+# FastAPI - fundacao do novo backend Python (PASSO 0A)
+fastapi
+uvicorn
+
+# Cliente HTTP requerido pelo TestClient da versao atual do FastAPI/Starlette
+# CORRIGIDO em 2026-09-05 (auditoria): estava "httpx2" (pacote PyPI real, mas
+# DIFERENTE de "httpx" — nao satisfaz nenhum "import httpx" sem chamar
+# httpx2.alias_httpx() antes, o que este repo nunca faz). app/api/compatibility.py,
+# app/core/openai_costs_ledger.py, app/core/openai_gateway.py,
+# app/core/startup_guard.py e tests/test_openai_*.py todos fazem "import httpx"
+# direto. O .venv atual funciona hoje só porque "httpx" (0.28.1) já está
+# instalado nele por fora deste arquivo — um `pip install -r requirements.txt`
+# em uma maquina/venv nova NAO instalaria "httpx" e quebraria esses 4 modulos
+# com ModuleNotFoundError. "httpx2" nunca e referenciado em nenhum lugar do
+# codigo (grep confirmado) — era ruido, nao uma dependencia real.
+httpx==0.28.1
+
+# ── PostgreSQL (P0/P1 — fundacao, ainda nao usado pelo runtime) ─────────────
+# app/db/: engine/models/repositories. Driver sync (psycopg[binary]), sem
+# stack async — nao ha padrao async-DB no projeto que o justifique ainda.
+sqlalchemy==2.0.52
+alembic==1.19.2
+psycopg[binary]==3.3.5

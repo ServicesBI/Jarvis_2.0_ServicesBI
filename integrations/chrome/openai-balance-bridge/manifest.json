@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "JARVIS OpenAI Balance Bridge",
+  "version": "1.0.2",
+  "description": "Envia somente o saldo do card Credit balance para o JARVIS local.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwBg5vSC3m8eH+pTQAieLoEXnEzVXTm/n+DQ3hJo/YToKceIzV7lwdiduuD4vm4spSCwYNU46DUQ1sNbpyxJUS/gy+W6p52uJMynBCIvQyw8Z+rxW6awEZhmm5iNlQp5eUUrcYEYOCIRzvjondTmEOhzyE64kjGQ+8HdElDtMlbVtvwn/xCVut22fmCpr6ZlYSwMGVmayfrP4Oe6gsMyrZFpyvMCKzUZ9PBj5fQ0qK8NiKB3Kbck1ETSK0hzEhV/djcCmWoQ5IJ3RaqqHNmXQmsgqNeBnn4+V5P/I1so0m71MUwtwG2Cybgvkh8BorFtzxKIqozfxX9IuhA4YTstoyQIDAQAB",
+  "permissions": [],
+  "host_permissions": ["https://platform.openai.com/*", "http://127.0.0.1:8000/*"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [{
+    "matches": ["https://platform.openai.com/*"],
+    "js": ["parser.js", "content.js"],
+    "run_at": "document_idle"
+  }]
+}

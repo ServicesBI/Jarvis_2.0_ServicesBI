@@ -1,0 +1,15 @@
+{
+  "name": "jarvis-voice-assistant",
+  "version": "4.0.0",
+  "description": "JARVIS - assistente local com backend FastAPI e runtimes auxiliares",
+  "type": "module",
+  "scripts": {
+    "jarvis": "cmd.exe /d /c call \"Ligar JARVIS.bat\"",
+    "start": "cmd.exe /d /c call \"Ligar JARVIS.bat\"",
+    "openai-billing:login": "node scripts/openai-billing-login.js",
+    "test:openai-balance": "node --test tests/openai-balance/openai-balance-parser.test.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.40.0"
+  }
+}
